@@ -31,7 +31,7 @@ export class AppController {
     
     // Check database connection
     let databaseStatus = 'disconnected';
-    let databaseError = null;
+    let databaseError: string | null = null;
     try {
       await this.dataSource.query('SELECT 1');
       databaseStatus = 'connected';
