@@ -56,12 +56,30 @@ export class SetupController {
 
       const firstUser = users.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
       
-      // Security check - confirm email
-      if (body.confirmEmail !== firstUser.email) {
+      // Security check - confirm email (trim whitespace and normalize)
+      const providedEmail = (body.confirmEmail || '').trim().toLowerCase();
+      const firstUserEmail = firstUser.email.trim().toLowerCase();
+      
+      console.log('Email comparison:', {
+        provided: providedEmail,
+        expected: firstUserEmail,
+        providedRaw: body.confirmEmail,
+        expectedRaw: firstUser.email,
+        match: providedEmail === firstUserEmail
+      });
+
+      if (providedEmail !== firstUserEmail) {
         return {
           success: false,
           message: 'Email не совпадает с первым пользователем в системе',
-          hint: `Ожидается: ${firstUser.email}`
+          debug: {
+            providedEmail: body.confirmEmail,
+            expectedEmail: firstUser.email,
+            providedLength: body.confirmEmail?.length,
+            expectedLength: firstUser.email?.length,
+            providedTrimmed: providedEmail,
+            expectedTrimmed: firstUserEmail
+          }
         };
       }
 
@@ -91,6 +109,46 @@ export class SetupController {
           email: updatedUser.email,
           name: updatedUser.name,
           role: updatedUser.role
+        }
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: 'Ошибка при назначении роли',
+        error: error.message
+      };
+    }
+  }
+
+  @Post('force-promote-first') 
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Force promote first user to SuperAdmin (Debug only)' })
+  async forcePromoteFirst(): Promise<any> {
+    try {
+      const users = await this.usersService.findAll();
+      
+      if (users.length === 0) {
+        return {
+          success: false,
+          message: 'Нет пользователей в системе'
+        };
+      }
+
+      const firstUser = users.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())[0];
+      
+      // Force promote to SuperAdmin
+      await this.usersService.update(firstUser.id, { role: Role.SUPER_ADMIN });
+      const updatedUser = await this.usersService.findOne(firstUser.id);
+
+      return {
+        success: true,
+        message: 'Первый пользователь принудительно назначен SuperAdmin!',
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          name: updatedUser.name,
+          role: updatedUser.role,
+          createdAt: updatedUser.createdAt
         }
       };
     } catch (error: any) {

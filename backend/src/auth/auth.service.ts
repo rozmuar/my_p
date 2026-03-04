@@ -11,14 +11,24 @@ export class AuthService {
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+    console.log('Login attempt:', { email: loginDto.email });
+    
     const user = await this.usersService.validatePassword(
       loginDto.email,
       loginDto.password,
     );
 
     if (!user) {
+      console.log('Login failed: Invalid credentials for', loginDto.email);
       throw new UnauthorizedException('Неверный логин или пароль');
     }
+
+    console.log('Login successful for user:', { 
+      id: user.id, 
+      email: user.email, 
+      role: user.role,
+      isActive: user.isActive 
+    });
 
     const payload = { email: user.email, sub: user.id };
     const access_token = this.jwtService.sign(payload);

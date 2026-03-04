@@ -68,11 +68,19 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
     
+    // Only hash password if it's actually being updated 
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 12);
+      const hashedPassword = await bcrypt.hash(updateUserDto.password, 12);
+      // Use spread to avoid mutating the original DTO
+      const updateData = { ...updateUserDto, hashedPassword };
+      delete updateData.password; // Remove plain password
+      
+      Object.assign(user, updateData);
+    } else {
+      // Update other fields without touching password
+      Object.assign(user, updateUserDto);
     }
-
-    Object.assign(user, updateUserDto);
+    
     return this.usersRepository.save(user);
   }
 
@@ -84,12 +92,25 @@ export class UsersService {
   }
 
   async validatePassword(email: string, password: string): Promise<User | null> {
+    console.log('Validating password for email:', email);
+    
     const user = await this.findByEmail(email);
     if (!user) {
+      console.log('User not found for email:', email);
       return null;
     }
 
+    console.log('User found:', { 
+      id: user.id, 
+      email: user.email, 
+      role: user.role,
+      isActive: user.isActive,
+      hashedPasswordLength: user.hashedPassword?.length 
+    });
+
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
+    console.log('Password validation result:', isPasswordValid);
+    
     return isPasswordValid ? user : null;
   }
 }
