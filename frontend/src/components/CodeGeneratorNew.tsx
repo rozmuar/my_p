@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store';
 import { t } from '@/i18n/russian';
 import {
@@ -118,7 +118,7 @@ const CodeGenerator = ({ method, url, headers = {}, body, auth }: CodeGeneratorP
   const currentLanguage = languages.find(lang => lang.id === selectedLanguage);
 
   // Генерация кода при изменении параметров
-  useState(() => {
+  useEffect(() => {
     if (selectedLanguage && selectedLibrary) {
       const code = generateCode(selectedLanguage, selectedLibrary);
       setGeneratedCode(code);

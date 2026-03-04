@@ -8,9 +8,13 @@ export interface HttpRequest {
   params: Record<string, string>;
   auth?: AuthConfig;
   description?: string;
+  collectionId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
+
+// Alias for backwards compatibility
+export type Request = HttpRequest;
 
 export interface HttpResponse {
   status: number;
@@ -63,6 +67,7 @@ export interface AuthConfig {
   key?: string;
   value?: string;
   location?: 'header' | 'query';
+  addTo?: 'header' | 'query' | 'body';
 }
 
 export interface User {
@@ -70,7 +75,7 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
-  role: 'owner' | 'editor' | 'viewer';
+  role: 'owner' | 'editor' | 'viewer' | 'admin' | 'superAdmin';
 }
 
 export interface Environment {

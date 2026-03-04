@@ -11,7 +11,8 @@ import {
   Monitor,
   Moon,
   Sun,
-  Shield
+  Shield,
+  Languages
 } from 'lucide-react';
 
 const Header = () => {
@@ -19,7 +20,9 @@ const Header = () => {
   const { environments, activeEnvironmentId, setActiveEnvironment } = useAppStore();
   const [showEnvDropdown, setShowEnvDropdown] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light');
+  const [language, setLanguage] = useState<'ru' | 'en'>('ru');
 
   // Mock user data - replace with real user data
   const currentUser = {

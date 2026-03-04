@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, forwardRef } from 'react';
 import EditorJS, { OutputData } from '@editorjs/editorjs';
 
 // Импорт плагинов EditorJS
@@ -12,19 +12,19 @@ import Code from '@editorjs/code';
 import Table from '@editorjs/table';
 import Delimiter from '@editorjs/delimiter';
 
-interface EditorJSComponentProps {
+export interface EditorJSComponentProps {
   data?: OutputData;
   onChange?: (data: OutputData) => void;
   placeholder?: string;
   readOnly?: boolean;
 }
 
-const EditorJSComponent = ({ 
+const EditorJSComponent = forwardRef<HTMLDivElement, EditorJSComponentProps>(({ 
   data, 
   onChange, 
   placeholder = 'Начните писать...', 
   readOnly = false 
-}: EditorJSComponentProps) => {
+}, ref) => {
   const editorRef = useRef<EditorJS | null>(null);
   const holderRef = useRef<HTMLDivElement>(null);
 
@@ -248,7 +248,7 @@ const EditorJSComponent = ({
   return (
     <div className="w-full">
       <div 
-        ref={holderRef}
+        ref={ref || holderRef}
         className={`
           prose max-w-none border border-gray-300 rounded-lg p-4 min-h-[400px] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20
           ${readOnly ? 'bg-gray-50' : 'bg-white'}
@@ -256,7 +256,9 @@ const EditorJSComponent = ({
       />
     </div>
   );
-};
+});
+
+EditorJSComponent.displayName = 'EditorJSComponent';
 
 // Экспорт компонента с ref для доступа к методам
 export default EditorJSComponent;
