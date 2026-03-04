@@ -14,7 +14,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting */
+    /* Linting - Updated to fix build issues */
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
