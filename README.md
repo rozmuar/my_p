@@ -57,7 +57,7 @@ Choose one of these setup methods:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-username/postapi.git
+git clone https://github.com/rozmuar/my_p.git
 cd postapi
 
 # 2. Create environment config
@@ -81,7 +81,7 @@ docker-compose up -d
 ### 1. Clone the Repository
 
 \`\`\`bash
-git clone https://github.com/your-username/postapi.git
+git clone https://github.com/rozmuar/my_p.git
 cd postapi
 \`\`\`
 

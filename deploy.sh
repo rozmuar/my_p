@@ -55,7 +55,7 @@ fi
 # Clone repository (if not already cloned)
 if [ ! -d "postapi" ]; then
     echo -e "${BLUE}📥 Cloning PostAPI repository...${NC}"
-    git clone YOUR_REPO_URL postapi
+    git clone https://github.com/rozmuar/my_p.git postapi
     cd postapi
 else
     echo -e "${BLUE}🔄 Updating existing repository...${NC}"

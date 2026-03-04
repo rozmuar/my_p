@@ -3,7 +3,7 @@
 ## One-Line Deployment
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOUR-USERNAME/postapi/main/deploy.sh | bash
+curl -fsSL https://raw.githubusercontent.com/rozmuar/my_p/master/deploy.sh | bash
 ```
 
 ## Manual Deployment Steps
@@ -27,7 +27,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 ### 2. Deploy Application
 ```bash
 # Clone repository
-git clone YOUR_REPO_URL postapi
+git clone git@github.com:rozmuar/my_p.git postapi
 cd postapi
 
 # Start services
