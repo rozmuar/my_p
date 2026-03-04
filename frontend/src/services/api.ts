@@ -2,7 +2,7 @@ import axios, { AxiosResponse, AxiosError } from 'axios';
 import type { HttpRequest, HttpResponse, CodeGeneration, User } from '@/types';
 
 class ApiService {
-  private baseURL = '/api';
+  private baseURL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
 
   private apiClient = axios.create({
     baseURL: this.baseURL,
