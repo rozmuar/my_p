@@ -35,7 +35,9 @@ const HomePage = () => {
         name: 'Новый запрос',
         method: 'GET',
         url: '',
-        collectionId: selectedCollectionId
+        collectionId: selectedCollectionId,
+        headers: {},
+        params: {}
       });
     }
   };

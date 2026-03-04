@@ -188,11 +188,16 @@ const HistoryPanel = () => {
     try {
       // Создаем новый запрос на основе истории
       await executeRequest({
+        id: crypto.randomUUID(),
+        name: 'Replay Request',
         method: history.method,
         url: history.url,
         headers: history.headers || {},
         body: history.body,
-        auth: history.auth
+        auth: history.auth,
+        params: {},
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
       toast.success('Запрос выполнен повторно');
     } catch (error) {

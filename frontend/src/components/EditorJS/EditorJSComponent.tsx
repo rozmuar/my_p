@@ -41,7 +41,7 @@ const EditorJSComponent = forwardRef<HTMLDivElement, EditorJSComponentProps>(({
       },
       tools: {
         header: {
-          class: Header,
+          class: Header as any,
           config: {
             levels: [1, 2, 3, 4, 5, 6],
             defaultLevel: 2,
@@ -49,25 +49,25 @@ const EditorJSComponent = forwardRef<HTMLDivElement, EditorJSComponentProps>(({
           }
         },
         paragraph: {
-          class: Paragraph,
+          class: Paragraph as any,
           config: {
             placeholder: 'Введите текст...'
           }
         },
         list: {
-          class: List,
+          class: List as any,
           config: {
             defaultStyle: 'unordered'
           }
         },
         linkTool: {
-          class: LinkTool,
+          class: LinkTool as any,
           config: {
             endpoint: '/api/fetch-url' // Заглушка для получения мета-данных ссылки
           }
         },
         image: {
-          class: Image,
+          class: Image as any,
           config: {
             endpoints: {
               byFile: '/api/upload-image', // Заглушка для загрузки файлов
@@ -102,27 +102,27 @@ const EditorJSComponent = forwardRef<HTMLDivElement, EditorJSComponentProps>(({
           }
         },
         quote: {
-          class: Quote,
+          class: Quote as any,
           config: {
             quotePlaceholder: 'Введите цитату...',
             captionPlaceholder: 'Автор цитаты'
           }
         },
         code: {
-          class: Code,
+          class: Code as any,
           config: {
             placeholder: 'Введите код...'
           }
         },
         table: {
-          class: Table,
+          class: Table as any,
           config: {
             rows: 2,
             cols: 3
           }
         },
         delimiter: {
-          class: Delimiter
+          class: Delimiter as any
         }
       },
       onChange: async () => {
@@ -262,4 +262,3 @@ EditorJSComponent.displayName = 'EditorJSComponent';
 
 // Экспорт компонента с ref для доступа к методам
 export default EditorJSComponent;
-export type { EditorJSComponentProps };

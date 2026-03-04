@@ -26,7 +26,7 @@ import {
   Clock
 } from 'lucide-react';
 import { DropdownMenu } from '@/components/ui/DropdownMenu';
-import { InputModal } from '@/components/ui/InputModal';
+import InputModal from '@/components/ui/InputModal';
 import toast from 'react-hot-toast';
 import type { Collection, Request } from '@/types';
 
@@ -93,7 +93,12 @@ const CollectionManager = () => {
         name,
         description: '',
         isPublic: false,
-        isHidden: false
+        isHidden: false,
+        requests: [],
+        folders: [],
+        variables: [],
+        isShared: false,
+        collaborators: []
       });
       toast.success('Коллекция создана');
       setShowCreateModal(false);
@@ -132,7 +137,9 @@ const CollectionManager = () => {
         name,
         method: 'GET',
         url: '',
-        collectionId: currentCollection.id
+        collectionId: currentCollection.id,
+        headers: {},
+        params: {}
       });
       toast.success('Запрос создан');
       setShowNewRequestModal(false);
@@ -144,10 +151,10 @@ const CollectionManager = () => {
 
   const handleDuplicateCollection = async (collection: Collection) => {
     try {
+      const { id, createdAt, updatedAt, ...collectionData } = collection;
       await createCollection({
-        ...collection,
-        name: `${collection.name} (копия)`,
-        id: undefined
+        ...collectionData,
+        name: `${collection.name} (копия)`
       });
       toast.success('Коллекция скопирована');
     } catch (error) {
