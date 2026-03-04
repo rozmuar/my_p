@@ -23,7 +23,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
       password: process.env.DB_PASSWORD || 'password',
       database: process.env.DB_NAME || 'postapi',
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production',
+      synchronize: true, // Enable for table creation
       logging: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,

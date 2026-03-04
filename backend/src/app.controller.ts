@@ -58,9 +58,11 @@ export class AppController {
       
       // Test users table
       let usersTableExists = false;
+      let usersCount = 0;
       try {
-        await this.dataSource.query('SELECT COUNT(*) FROM users');
+        const countResult = await this.dataSource.query('SELECT COUNT(*) FROM users');
         usersTableExists = true;
+        usersCount = parseInt(countResult[0].count);
       } catch (error) {
         console.log('Users table does not exist:', (error as Error).message);
       }
@@ -69,11 +71,32 @@ export class AppController {
         message: 'Database test completed',
         currentTime: result[0]?.current_time,
         usersTableExists,
+        usersCount: usersTableExists ? usersCount : undefined,
         timestamp: new Date().toISOString()
       };
     } catch (error) {
       return {
         message: 'Database test failed',
+        error: (error as Error).message,
+        timestamp: new Date().toISOString()
+      };
+    }
+  }
+
+  @Get('create-tables')
+  @ApiOperation({ summary: 'Force create database tables' })
+  async createTables(): Promise<object> {
+    try {
+      // Force synchronization
+      await this.dataSource.synchronize();
+      
+      return {
+        message: 'Database tables synchronized successfully',
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      return {
+        message: 'Failed to synchronize tables',
         error: (error as Error).message,
         timestamp: new Date().toISOString()
       };
