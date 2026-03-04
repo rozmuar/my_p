@@ -59,10 +59,10 @@ const RequestPanel = () => {
       );
       
       addToHistory(activeRequest.id, response);
-      toast.success('Request completed successfully');
+      toast.success('Запрос выполнен успешно');
     } catch (error) {
       addToHistory(activeRequest.id, undefined, error instanceof Error ? error.message : 'Unknown error');
-      toast.error('Request failed');
+      toast.error('Ошибка выполнения запроса');
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ const RequestPanel = () => {
   };
 
   const handleSaveRequest = () => {
-    toast.success('Request saved');
+    toast.success('Запрос сохранен');
   };
 
   return (
@@ -381,9 +381,9 @@ const BodyTab = ({ body, method, onUpdate }: BodyTabProps) => {
       try {
         const formatted = formatJson(body);
         onUpdate(formatted);
-        toast.success('JSON formatted');
+        toast.success('JSON отформатирован');
       } catch {
-        toast.error('Invalid JSON');
+        toast.error('Неверный JSON');
       }
     }
   };

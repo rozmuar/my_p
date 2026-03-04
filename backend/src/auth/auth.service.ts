@@ -17,7 +17,7 @@ export class AuthService {
     );
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Неверный логин или пароль');
     }
 
     const payload = { email: user.email, sub: user.id };
@@ -42,7 +42,7 @@ export class AuthService {
       const existingUser = await this.usersService.findByEmail(registerDto.email);
       if (existingUser) {
         console.log('User already exists:', registerDto.email);
-        throw new ConflictException('User with this email already exists');
+        throw new ConflictException('Пользователь с таким email уже существует');
       }
 
       // Create new user
@@ -72,12 +72,28 @@ export class AuthService {
   async validateUserByJwt(payload: any): Promise<any> {
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Недействительный токен');
     }
     return {
       id: user.id,
       email: user.email,
       name: user.name,
+    };
+  }
+
+  async findById(id: string): Promise<any> {
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      throw new UnauthorizedException('Пользователь не найден');
+    }
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
     };
   }
 }

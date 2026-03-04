@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError } from 'axios';
-import type { HttpRequest, HttpResponse, CodeGeneration } from '@/types';
+import type { HttpRequest, HttpResponse, CodeGeneration, User } from '@/types';
 
 class ApiService {
   private baseURL = '/api';
@@ -152,6 +152,26 @@ class ApiService {
   async logout() {
     await this.apiClient.post('/auth/logout');
     localStorage.removeItem('auth_token');
+  }
+
+  async getCurrentUser(): Promise<User> {
+    const response = await this.apiClient.get('/auth/me');
+    return response.data;
+  }
+
+  // Admin API
+  async getUsers() {
+    const response = await this.apiClient.get('/admin/users');
+    return response.data;
+  }
+
+  async updateUser(id: string, userData: Partial<User>) {
+    const response = await this.apiClient.put(`/admin/users/${id}`, userData);
+    return response.data;
+  }
+
+  async deleteUser(id: string) {
+    await this.apiClient.delete(`/admin/users/${id}`);
   }
 }
 

@@ -20,10 +20,10 @@ const LoginPage = () => {
     try {
       const response = await apiService.login(formData.email, formData.password);
       localStorage.setItem('auth_token', response.token);
-      toast.success('Welcome back!');
+      toast.success('Добро пожаловать!');
       navigate('/app');
     } catch (error) {
-      toast.error('Invalid credentials');
+      toast.error('Неверные данные для входа');
     } finally {
       setIsLoading(false);
     }
@@ -45,7 +45,7 @@ const LoginPage = () => {
             <span className="text-white font-bold text-xl">PA</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">PostAPI</h1>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
+          <p className="text-gray-600 mt-2">Вход в аккаунт</p>
         </div>
 
         {/* Form */}
@@ -54,7 +54,7 @@ const LoginPage = () => {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                Электронная почта
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -66,7 +66,7 @@ const LoginPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="input pl-11"
-                  placeholder="Enter your email"
+                  placeholder="Введите ваш email"
                 />
               </div>
             </div>
@@ -74,7 +74,7 @@ const LoginPage = () => {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                Пароль
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -86,7 +86,7 @@ const LoginPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="input pl-11 pr-11"
-                  placeholder="Enter your password"
+                  placeholder="Введите ваш пароль"
                 />
                 <button
                   type="button"
@@ -130,7 +130,7 @@ const LoginPage = () => {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Sign in</span>
+                  <span>Войти</span>
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}

@@ -122,7 +122,7 @@ const ResponseTab = ({ response, error, request }: ResponseTabProps) => {
         : JSON.stringify(response.data, null, 2);
     
     copyToClipboard(text);
-    toast.success('Response copied to clipboard');
+    toast.success('Ответ скопирован в буфер обмена');
   };
 
   const handleDownloadResponse = () => {
@@ -131,7 +131,7 @@ const ResponseTab = ({ response, error, request }: ResponseTabProps) => {
       : JSON.stringify(response.data, null, 2);
     
     downloadFile(text, `response-${Date.now()}.json`, 'application/json');
-    toast.success('Response downloaded');
+    toast.success('Ответ скачан');
   };
 
   const generateCode = () => {
@@ -292,7 +292,7 @@ const ResponseTab = ({ response, error, request }: ResponseTabProps) => {
                 <button
                   onClick={() => {
                     copyToClipboard(generateCode());
-                    toast.success('Code copied to clipboard');
+                    toast.success('Код скопирован в буфер обмена');
                   }}
                   className="btn-secondary flex items-center space-x-2 text-sm"
                 >

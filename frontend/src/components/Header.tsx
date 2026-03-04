@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import { t } from '@/i18n/russian';
@@ -11,37 +11,67 @@ import {
   Monitor,
   Moon,
   Sun,
-  Shield,
-  Languages
+  Shield
 } from 'lucide-react';
 
 const Header = () => {
   const navigate = useNavigate();
-  const { environments, activeEnvironmentId, setActiveEnvironment } = useAppStore();
+  const { 
+    environments, 
+    activeEnvironmentId, 
+    setActiveEnvironment,
+    currentUser,
+    isUserLoading,
+    loadCurrentUser,
+    logout,
+    theme,
+    setTheme
+  } = useAppStore();
+  
   const [showEnvDropdown, setShowEnvDropdown] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('light');
-  const [language, setLanguage] = useState<'ru' | 'en'>('ru');
 
-  // Mock user data - replace with real user data
-  const currentUser = {
-    name: 'Иван Петров',
-    email: 'ivan@example.com',
-    role: 'superAdmin' as const, // Change this for testing different roles
-  };
+  // Load user on mount
+  useEffect(() => {
+    loadCurrentUser();
+  }, [loadCurrentUser]);
 
   const activeEnvironment = environments.find(env => env.id === activeEnvironmentId);
 
-  const handleLogout = () => {
-    localStorage.removeItem('auth_token');
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    await logout();
   };
 
   const handleAdminPanel = () => {
     navigate('/admin');
     setShowUserMenu(false);
   };
+
+  const handleProfile = () => {
+    navigate('/profile');
+    setShowUserMenu(false);
+  };
+
+  const handleSettings = () => {
+    navigate('/settings');
+    setShowUserMenu(false);
+  };
+
+  if (isUserLoading) {
+    return (
+      <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-center px-6">
+        <div className="text-sm text-gray-600">Загрузка...</div>
+      </header>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-center px-6">
+        <div className="text-sm text-gray-600">Не авторизован</div>
+      </header>
+    );
+  }
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
@@ -106,43 +136,6 @@ const Header = () => {
 
       {/* Right Section */}
       <div className="flex items-center space-x-2">
-        {/* Language Selector */}
-        <div className="relative">
-          <button
-            onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-            className="flex items-center space-x-2 p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-          >
-            <Languages className="w-4 h-4" />
-            <span className="text-sm font-medium">{language.toUpperCase()}</span>
-          </button>
-
-          {showLanguageMenu && (
-            <div className="absolute top-full right-0 mt-2 w-32 bg-white rounded-lg shadow-medium border border-gray-200 py-2 z-50">
-              <button
-                onClick={() => {
-                  setLanguage('ru');
-                  setShowLanguageMenu(false);
-                }}
-                className={`w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 ${
-                  language === 'ru' ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
-                }`}
-              >
-                Русский
-              </button>
-              <button
-                onClick={() => {
-                  setLanguage('en');
-                  setShowLanguageMenu(false);
-                }}
-                className={`w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 ${
-                  language === 'en' ? 'bg-primary-50 text-primary-700 font-medium' : 'text-gray-700'
-                }`}
-              >
-                English
-              </button>
-            </div>
-          )}
-        </div>
         {/* Theme Selector */}
         <div className="flex items-center bg-gray-100 rounded-lg p-1">
           <button
@@ -172,7 +165,10 @@ const Header = () => {
         </div>
 
         {/* Settings */}
-        <button className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+        <button 
+          onClick={handleSettings}
+          className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+        >
           <Settings className="w-5 h-5" />
         </button>
 
@@ -201,12 +197,18 @@ const Header = () => {
                 </div>
               </div>
               
-              <button className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 text-gray-700 flex items-center space-x-2">
+              <button 
+                onClick={handleProfile}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 text-gray-700 flex items-center space-x-2"
+              >
                 <User className="w-4 h-4" />
                 <span>Профиль</span>
               </button>
               
-              <button className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 text-gray-700 flex items-center space-x-2">
+              <button 
+                onClick={handleSettings}
+                className="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors duration-150 text-gray-700 flex items-center space-x-2"
+              >
                 <Settings className="w-4 h-4" />
                 <span>Настройки</span>
               </button>

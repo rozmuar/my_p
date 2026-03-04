@@ -20,12 +20,12 @@ const RegisterPage = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error('Пароли не совпадают');
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
+      toast.error('Пароль должен содержать минимум 6 символов');
       return;
     }
 
@@ -34,10 +34,10 @@ const RegisterPage = () => {
     try {
       const response = await apiService.register(formData.name, formData.email, formData.password);
       localStorage.setItem('auth_token', response.token);
-      toast.success('Account created successfully!');
+      toast.success('Аккаунт успешно создан!');
       navigate('/app');
     } catch (error) {
-      toast.error('Failed to create account');
+      toast.error('Ошибка создания аккаунта');
     } finally {
       setIsLoading(false);
     }
@@ -51,10 +51,10 @@ const RegisterPage = () => {
   };
 
   const passwordRequirements = [
-    { label: 'At least 6 characters', met: formData.password.length >= 6 },
-    { label: 'Contains uppercase letter', met: /[A-Z]/.test(formData.password) },
-    { label: 'Contains lowercase letter', met: /[a-z]/.test(formData.password) },
-    { label: 'Contains number', met: /\d/.test(formData.password) },
+    { label: 'Минимум 6 символов', met: formData.password.length >= 6 },
+    { label: 'Содержит заглавную букву', met: /[A-ZА-Я]/.test(formData.password) },
+    { label: 'Содержит строчную букву', met: /[a-zа-я]/.test(formData.password) },
+    { label: 'Содержит цифру', met: /\d/.test(formData.password) },
   ];
 
   return (
@@ -66,7 +66,7 @@ const RegisterPage = () => {
             <span className="text-white font-bold text-xl">PA</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900">PostAPI</h1>
-          <p className="text-gray-600 mt-2">Create your account</p>
+          <p className="text-gray-600 mt-2">Создание аккаунта</p>
         </div>
 
         {/* Form */}
@@ -75,7 +75,7 @@ const RegisterPage = () => {
             {/* Name */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
+                Полное имя
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -87,7 +87,7 @@ const RegisterPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className="input pl-11"
-                  placeholder="Enter your full name"
+                  placeholder="Введите ваше полное имя"
                 />
               </div>
             </div>
@@ -95,7 +95,7 @@ const RegisterPage = () => {
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
+                Электронная почта
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -107,7 +107,7 @@ const RegisterPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="input pl-11"
-                  placeholder="Enter your email"
+                  placeholder="Введите ваш email"
                 />
               </div>
             </div>
@@ -115,7 +115,7 @@ const RegisterPage = () => {
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                Пароль
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -127,7 +127,7 @@ const RegisterPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   className="input pl-11 pr-11"
-                  placeholder="Create a password"
+                  placeholder="Создайте пароль"
                 />
                 <button
                   type="button"
@@ -141,7 +141,7 @@ const RegisterPage = () => {
               {/* Password Requirements */}
               {formData.password && (
                 <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs font-medium text-gray-700 mb-2">Password requirements:</p>
+                  <p className="text-xs font-medium text-gray-700 mb-2">Требования к паролю:</p>
                   <div className="space-y-1">
                     {passwordRequirements.map((req, index) => (
                       <div key={index} className="flex items-center space-x-2 text-xs">
@@ -163,7 +163,7 @@ const RegisterPage = () => {
             {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password
+                Подтверждение пароля
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -179,7 +179,7 @@ const RegisterPage = () => {
                       ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                       : ''
                   }`}
-                  placeholder="Confirm your password"
+                  placeholder="Подтвердите пароль"
                 />
                 <button
                   type="button"
@@ -191,7 +191,7 @@ const RegisterPage = () => {
               </div>
               
               {formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">Passwords do not match</p>
+                <p className="mt-1 text-sm text-red-600">Пароли не совпадают</p>
               )}
             </div>
 
@@ -205,13 +205,13 @@ const RegisterPage = () => {
                 className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-0.5"
               />
               <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-                I agree to the{' '}
+                Я согласен с{' '}
                 <Link to="/terms" className="text-primary-600 hover:text-primary-700 font-medium">
-                  Terms of Service
+                  Условиями обслуживания
                 </Link>{' '}
-                and{' '}
+                и{' '}
                 <Link to="/privacy" className="text-primary-600 hover:text-primary-700 font-medium">
-                  Privacy Policy
+                  Политикой конфиденциальности
                 </Link>
               </label>
             </div>
@@ -226,7 +226,7 @@ const RegisterPage = () => {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Create Account</span>
+                  <span>Создать аккаунт</span>
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
@@ -239,7 +239,7 @@ const RegisterPage = () => {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Already have an account?</span>
+              <span className="px-2 bg-white text-gray-500">Уже есть аккаунт?</span>
             </div>
           </div>
 
@@ -249,7 +249,7 @@ const RegisterPage = () => {
               to="/login"
               className="text-primary-600 hover:text-primary-700 font-medium text-sm"
             >
-              Sign in instead →
+              Войти в аккаунт →
             </Link>
           </div>
         </div>

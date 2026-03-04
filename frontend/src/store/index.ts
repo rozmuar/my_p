@@ -1,9 +1,17 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import type { HttpRequest, Collection, Environment, HttpResponse, RequestHistory } from '@/types';
+import { apiService } from '@/services/api';
+import type { HttpRequest, Collection, Environment, HttpResponse, RequestHistory, User } from '@/types';
 
 interface AppState {
+  // User
+  currentUser: User | null;
+  isUserLoading: boolean;
+  
+  // Theme
+  theme: 'light' | 'dark' | 'system';
+  
   // Collections
   collections: Collection[];
   activeCollectionId: string | null;
@@ -59,6 +67,15 @@ interface AppState {
   setSelectedTab: (tab: 'request' | 'response' | 'history') => void;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  
+  // User actions
+  loadCurrentUser: () => Promise<void>;
+  setCurrentUser: (user: User | null) => void;
+  logout: () => Promise<void>;
+  
+  // Theme actions  
+  setTheme: (theme: 'light' | 'dark' | 'system') => void;
+  applyTheme: (theme?: 'light' | 'dark' | 'system') => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -66,6 +83,9 @@ export const useAppStore = create<AppState>()(
     persist(
       (set, get) => ({
         // Initial state
+        currentUser: null,
+        isUserLoading: false,
+        theme: 'light' as 'light' | 'dark' | 'system',
         collections: [],
         activeCollectionId: null,
         selectedCollectionId: null,
@@ -292,10 +312,67 @@ export const useAppStore = create<AppState>()(
         setSelectedTab: (tab) => set({ selectedTab: tab }),
         toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
         setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+
+        // User actions
+        loadCurrentUser: async () => {
+          const { currentUser } = get();
+          if (currentUser) return; // Already loaded
+          
+          const token = localStorage.getItem('auth_token');
+          if (!token) return;
+          
+          set({ isUserLoading: true });
+          try {
+            const user = await apiService.getCurrentUser();
+            set({ currentUser: user, isUserLoading: false });
+          } catch (error) {
+            console.error('Failed to load current user:', error);
+            set({ isUserLoading: false });
+          }
+        },
+
+        setCurrentUser: (user) => set({ currentUser: user }),
+
+        logout: async () => {
+          try {
+            await apiService.logout();
+          } catch (error) {
+            console.error('Logout error:', error);
+          } finally {
+            set({ currentUser: null });
+            window.location.href = '/login';
+          }
+        },
+
+        // Theme actions
+        setTheme: (theme) => {
+          set({ theme });
+          get().applyTheme(theme);
+        },
+
+        applyTheme: (theme) => {
+          const selectedTheme = theme || get().theme;
+          const root = document.documentElement;
+          
+          if (selectedTheme === 'dark') {
+            root.classList.add('dark');
+          } else if (selectedTheme === 'light') {
+            root.classList.remove('dark');
+          } else {
+            // System theme
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDark) {
+              root.classList.add('dark');
+            } else {
+              root.classList.remove('dark');
+            }
+          }
+        },
       }),
       {
         name: 'postapi-storage',
         partialize: (state) => ({
+          theme: state.theme,
           collections: state.collections,
           environments: state.environments,
           activeEnvironmentId: state.activeEnvironmentId,

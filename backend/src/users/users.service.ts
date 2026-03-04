@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User, Role } from './user.entity';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -19,14 +19,21 @@ export class UsersService {
       const hashedPassword = await bcrypt.hash(createUserDto.password, 12);
       console.log('Password hashed successfully');
       
+      // Check if this is the first user in the system
+      const userCount = await this.usersRepository.count();
+      const isFirstUser = userCount === 0;
+      
       const user = this.usersRepository.create({
         ...createUserDto,
         hashedPassword,
+        role: isFirstUser ? Role.SUPER_ADMIN : Role.USER, // First user becomes super admin
       });
+      
+      console.log(isFirstUser ? 'Creating FIRST USER as SUPER ADMIN' : 'Creating regular user');
       console.log('User entity created, saving to database...');
 
       const savedUser = await this.usersRepository.save(user);
-      console.log('User saved successfully:', savedUser.id);
+      console.log(`User saved successfully: ${savedUser.id} ${isFirstUser ? '(SUPER ADMIN)' : '(USER)'}`);
       
       return savedUser;
     } catch (error) {
@@ -37,14 +44,14 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.find({
-      select: ['id', 'email', 'name', 'avatar', 'isActive', 'createdAt', 'updatedAt'],
+      select: ['id', 'email', 'name', 'avatar', 'role', 'isActive', 'lastLoginAt', 'createdAt', 'updatedAt'],
     });
   }
 
   async findOne(id: string): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'email', 'name', 'avatar', 'isActive', 'createdAt', 'updatedAt'],
+      select: ['id', 'email', 'name', 'avatar', 'role', 'isActive', 'lastLoginAt', 'createdAt', 'updatedAt'],
     });
 
     if (!user) {

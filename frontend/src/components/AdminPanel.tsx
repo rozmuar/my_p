@@ -8,65 +8,53 @@ import {
   Shield,
   CheckCircle,
   XCircle,
-  Crown
+  Crown,
+  FileText,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import { t } from '@/i18n/russian';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'user' | 'admin' | 'superAdmin';
-  status: 'active' | 'inactive';
-  createdAt: string;
-  lastLogin?: string;
-}
+import { apiService } from '@/services/api';
+import { useAppStore } from '@/store';
+import toast from 'react-hot-toast';
+import type { User } from '@/types';
 
 const AdminPanel = () => {
+  const { currentUser } = useAppStore();
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<'all' | 'user' | 'admin' | 'superAdmin'>('all');
+  const [filterRole, setFilterRole] = useState<'all' | 'user' | 'editor' | 'viewer' | 'admin' | 'superAdmin'>('all');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
   const [showMenu, setShowMenu] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'users' | 'news'>('users');
 
-  // Mock data - replace with real API calls
+  // Load real users data
   useEffect(() => {
-    setUsers([
-      {
-        id: '1',
-        name: 'Иван Петров',
-        email: 'ivan@example.com',
-        role: 'user',
-        status: 'active',
-        createdAt: '2024-01-15',
-        lastLogin: '2024-03-01',
-      },
-      {
-        id: '2',
-        name: 'Мария Сидорова',
-        email: 'maria@example.com',
-        role: 'admin',
-        status: 'active',
-        createdAt: '2024-01-10',
-        lastLogin: '2024-03-02',
-      },
-      {
-        id: '3',
-        name: 'Super Admin',
-        email: 'admin@postapi.com',
-        role: 'superAdmin',
-        status: 'active',
-        createdAt: '2024-01-01',
-        lastLogin: '2024-03-03',
-      },
-    ]);
+    loadUsers();
   }, []);
+
+  const loadUsers = async () => {
+    try {
+      setIsLoading(true);
+      const userData = await apiService.getUsers();
+      setUsers(userData);
+    } catch (error) {
+      console.error('Error loading users:', error);
+      toast.error('Ошибка загрузки пользователей');
+      // Fallback to empty array
+      setUsers([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole === 'all' || user.role === filterRole;
-    const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
+    const matchesStatus = filterStatus === 'all' || 
+                         (filterStatus === 'active' && user.isActive) ||
+                         (filterStatus === 'inactive' && !user.isActive);
     
     return matchesSearch && matchesRole && matchesStatus;
   });
@@ -93,31 +81,54 @@ const AdminPanel = () => {
     }
   };
 
-  const getStatusIcon = (status: User['status']) => {
-    return status === 'active' 
+  const getStatusIcon = (isActive?: boolean) => {
+    return isActive 
       ? <CheckCircle className="w-4 h-4 text-green-500" />
       : <XCircle className="w-4 h-4 text-red-500" />;
   };
 
-  const handleRoleChange = (userId: string, newRole: User['role']) => {
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, role: newRole } : user
-    ));
+  const handleRoleChange = async (userId: string, newRole: User['role']) => {
+    try {
+      await apiService.updateUser(userId, { role: newRole });
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role: newRole } : user
+      ));
+      toast.success('Роль пользователя обновлена');
+    } catch (error) {
+      toast.error('Ошибка обновления роли');
+    }
     setShowMenu(null);
   };
 
-  const handleStatusToggle = (userId: string) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, status: user.status === 'active' ? 'inactive' : 'active' }
-        : user
-    ));
+  const handleStatusToggle = async (userId: string) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+      
+      const newStatus = user.isActive ? false : true;
+      await apiService.updateUser(userId, { isActive: newStatus });
+      
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, isActive: newStatus } : user
+      ));
+      toast.success('Статус пользователя обновлен');
+    } catch (error) {
+      toast.error('Ошибка обновления статуса');
+    }
     setShowMenu(null);
   };
 
-  const handleDeleteUser = (userId: string) => {
-    if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+      return;
+    }
+    
+    try {
+      await apiService.deleteUser(userId);
       setUsers(users.filter(user => user.id !== userId));
+      toast.success('Пользователь удален');
+    } catch (error) {
+      toast.error('Ошибка удаления пользователя');
     }
     setShowMenu(null);
   };
@@ -130,8 +141,57 @@ const AdminPanel = () => {
           <Shield className="w-6 h-6 text-primary-600" />
           <h1 className="text-2xl font-bold text-gray-900">{t.adminPanel}</h1>
         </div>
-        <p className="text-gray-600">{t.userManagement}</p>
+        <p className="text-gray-600">Управление пользователями и контентом</p>
       </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200 mb-6">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'users'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center space-x-2">
+              <Users className="w-4 h-4" />
+              <span>Пользователи</span>
+            </div>
+          </button>
+          
+          {(currentUser?.role === 'superAdmin') && (
+            <button
+              onClick={() => setActiveTab('news')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'news'
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center space-x-2">
+                <FileText className="w-4 h-4" />
+                <span>Управление новостями</span>
+              </div>
+            </button>
+          )}
+        </nav>
+      </div>
+
+      {/* Content */}
+      {activeTab === 'users' && (
+        <div>
+          {/* Loading State */}
+          {isLoading && (
+            <div className="text-center py-8">
+              <div className="text-lg text-gray-600">Загрузка пользователей...</div>
+            </div>
+          )}
+
+          {/* User Management Content */}
+          {!isLoading && (
+            <div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
@@ -226,11 +286,11 @@ const AdminPanel = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center space-x-2">
-                      {getStatusIcon(user.status)}
+                      {getStatusIcon(user.isActive)}
                       <span className={`text-sm ${
-                        user.status === 'active' ? 'text-green-800' : 'text-red-800'
+                        user.isActive ? 'text-green-800' : 'text-red-800'
                       }`}>
-                        {user.status === 'active' ? t.active : t.inactive}
+                        {user.isActive ? 'Активен' : 'Неактивен'}
                       </span>
                     </div>
                   </td>
@@ -321,10 +381,33 @@ const AdminPanel = () => {
         </div>
       </div>
 
-      {filteredUsers.length === 0 && (
+      {filteredUsers.length === 0 && !isLoading && (
         <div className="text-center py-12">
           <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <p className="text-gray-500">Пользователи не найдены</p>
+        </div>
+      )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* News Management Tab */}
+      {activeTab === 'news' && (
+        <div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="text-center py-12">
+              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg mb-2">Управление новостями</p>
+              <p className="text-gray-400 text-sm">Функциональность в разработке</p>
+              <button
+                onClick={() => window.open('/admin/news', '_blank')}
+                className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                Открыть редактор новостей
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

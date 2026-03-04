@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CollectionsModule } from './collections/collections.module';
 import { RequestsModule } from './requests/requests.module';
 import { UsersModule } from './users/users.module';
+import { AdminModule } from './admin/admin.module';
 import { CodeGenerationModule } from './code-generation/code-generation.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
 
@@ -28,6 +29,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
     }),
     AuthModule,
     UsersModule,
+    AdminModule,
     CollectionsModule,
     RequestsModule,
     CodeGenerationModule,
