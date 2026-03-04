@@ -146,7 +146,7 @@ const NewsAdminPage = () => {
             </div>
             <div className="grid grid-cols-1 gap-2">
               <button
-                onClick={() => quickLoginAs('super_admin')}
+                onClick={() => quickLoginAs('superAdmin')}
                 className="bg-purple-100 text-purple-800 px-3 py-2 rounded text-sm hover:bg-purple-200 transition-colors"
               >
                 <Crown className="w-4 h-4 inline mr-1" />
@@ -190,7 +190,7 @@ const NewsAdminPage = () => {
                 <strong>Текущий пользователь:</strong> {user.name}
               </p>
               <p className="text-sm text-gray-600">
-                <strong>Роль:</strong> {user.role === 'super_admin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'User'}
+                <strong>Роль:</strong> {user.role === 'superAdmin' ? 'Super Admin' : user.role === 'admin' ? 'Admin' : 'User'}
               </p>
             </div>
           )}

@@ -31,7 +31,7 @@ class AuthService {
       id: 'super-admin-1',
       name: 'Super Admin',
       email: 'superadmin@postapi.com',
-      role: 'super_admin',
+      role: 'superAdmin',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'
     },
     {
@@ -127,7 +127,7 @@ class AuthService {
   }
 
   // Проверка прав доступа
-  hasPermission(permission: 'read_news' | 'write_news' | 'admin_panel' | 'super_admin'): boolean {
+  hasPermission(permission: 'read_news' | 'write_news' | 'admin_panel' | 'superAdmin'): boolean {
     if (!this.state.user) return false;
 
     const { role } = this.state.user;
@@ -136,11 +136,11 @@ class AuthService {
       case 'read_news':
         return true; // Все могут читать новости
       case 'write_news':
-        return role === 'super_admin'; // Только super admin может создавать новости
+        return role === 'superAdmin'; // Только super admin может создавать новости
       case 'admin_panel':
-        return role === 'admin' || role === 'super_admin';
-      case 'super_admin':
-        return role === 'super_admin';
+        return role === 'admin' || role === 'superAdmin';
+      case 'superAdmin':
+        return role === 'superAdmin';
       default:
         return false;
     }
