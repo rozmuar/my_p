@@ -1,0 +1,105 @@
+services:
+  # Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: postapi-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-postapi}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - postapi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-postapi}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis Cache  
+  redis:
+    image: redis:7-alpine
+    container_name: postapi-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - postapi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      target: production
+    container_name: postapi-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres123}
+      DB_NAME: ${DB_NAME:-postapi}
+      JWT_SECRET: ${JWT_SECRET:-your-production-jwt-secret-change-this}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      API_PREFIX: api
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      SESSION_SECRET: ${SESSION_SECRET:-your-session-secret-change-this}
+      BCRYPT_ROUNDS: ${BCRYPT_ROUNDS:-12}
+      FILE_UPLOAD_DEST: ./uploads
+      MAX_FILE_SIZE: ${MAX_FILE_SIZE:-10485760}
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - postapi-network
+    volumes:
+      - backend_uploads:/app/uploads
+
+  # Frontend  
+  frontend:
+    build:
+      context: ./frontend
+      target: production
+    container_name: postapi-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+      VITE_APP_NAME: ${VITE_APP_NAME:-PostAPI}
+      VITE_APP_VERSION: ${VITE_APP_VERSION:-2.0.0}
+      VITE_ENVIRONMENT: production
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      - backend
+    networks:
+      - postapi-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_uploads:
+    driver: local
+
+networks:
+  postapi-network:
+    driver: bridge

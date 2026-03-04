@@ -1,0 +1,60 @@
+# docker-compose.override.yml
+# This file is automatically used by docker-compose and allows
+# local customization without modifying the main compose files
+
+version: '3.8'
+
+# Example overrides for local development
+# Uncomment and modify as needed
+
+services:
+  # Override frontend for local development
+  # frontend:
+  #   ports:
+  #     - "3000:80"
+  #   volumes:
+  #     - ./frontend/src:/app/src
+  #   environment:
+  #     - VITE_API_URL=http://localhost:3001
+
+  # Override backend for debugging
+  # backend:
+  #   ports:
+  #     - "3001:3001"
+  #     - "9229:9229"  # Node.js debug port
+  #   volumes:
+  #     - ./backend/src:/app/src
+  #   environment:
+  #     - NODE_ENV=development
+  #     - LOG_LEVEL=debug
+
+  # Override database for custom settings
+  # postgres:
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_LOG_STATEMENT=all
+  #   volumes:
+  #     - ./postgres-data:/var/lib/postgresql/data
+  #     - ./init-scripts:/docker-entrypoint-initdb.d
+
+  # Add additional services for local development
+  # adminer:
+  #   image: adminer:latest
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8081:8080"
+  #   environment:
+  #     ADMINER_DEFAULT_SERVER: postgres
+  #   networks:
+  #     - postapi-network
+
+# Add additional volumes if needed
+# volumes:
+#   postgres-data:
+#     driver: local
+
+# Add additional networks if needed  
+# networks:
+#   external-network:
+#     external: true
