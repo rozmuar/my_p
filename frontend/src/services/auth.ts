@@ -5,8 +5,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'user' | 'admin' | 'super_admin';
+  role: 'user' | 'editor' | 'viewer' | 'admin' | 'superAdmin';
   avatar?: string;
+  isActive?: boolean;
+  lastLoginAt?: Date;
 }
 
 export interface AuthState {

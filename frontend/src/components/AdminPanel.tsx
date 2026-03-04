@@ -295,7 +295,7 @@ const AdminPanel = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.lastLogin || 'Никогда'}
+                    {user.lastLoginAt || 'Никогда'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="relative">
@@ -345,7 +345,7 @@ const AdminPanel = () => {
                             onClick={() => handleStatusToggle(user.id)}
                             className="w-full text-left px-3 py-2 hover:bg-gray-50 transition-colors text-gray-700 flex items-center space-x-2"
                           >
-                            {user.status === 'active' ? (
+                            {user.isActive ? (
                               <>
                                 <XCircle className="w-4 h-4" />
                                 <span>Деактивировать</span>

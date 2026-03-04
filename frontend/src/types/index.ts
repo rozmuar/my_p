@@ -75,7 +75,7 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
-  role: 'owner' | 'editor' | 'viewer' | 'admin' | 'superAdmin';
+  role: 'user' | 'editor' | 'viewer' | 'admin' | 'superAdmin';
   createdAt?: Date;
   updatedAt?: Date;
   isActive?: boolean;
