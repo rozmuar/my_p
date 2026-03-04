@@ -3,18 +3,19 @@ import { AppService } from './app.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('Health')
-@Controller('')
+@Controller('') // This will be under /api/ prefix
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Health check endpoint' })
-  getHello(): object {
+  @ApiOperation({ summary: 'API Health check endpoint' })
+  getApiHello(): object {
     return {
-      message: 'PostAPI Backend is running!',
+      message: 'PostAPI API is running!',
       version: '1.0.0',
       status: 'healthy',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      prefix: '/api'
     };
   }
 

@@ -26,7 +26,26 @@ async function bootstrap() {
     }),
   );
 
-  // Global prefix
+  // Add root health endpoint before global prefix
+  app.use('/', (req, res, next) => {
+    if (req.method === 'GET' && req.url === '/') {
+      res.json({
+        message: 'PostAPI Backend is running!',
+        version: '1.0.0',
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        endpoints: {
+          api: '/api',
+          docs: '/api/docs',
+          health: '/api/health'
+        }
+      });
+      return;
+    }
+    next();
+  });
+
+  // Global prefix for API routes
   app.setGlobalPrefix('api');
 
   // Swagger documentation
