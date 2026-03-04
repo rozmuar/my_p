@@ -211,7 +211,7 @@ const Header = () => {
                 <span>Настройки</span>
               </button>
 
-              {(currentUser.role === 'admin' || currentUser.role === 'superAdmin') && (
+              {(['admin', 'superAdmin'] as const).includes(currentUser.role) && (
                 <>
                   <hr className="my-2" />
                   <button

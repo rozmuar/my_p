@@ -76,6 +76,10 @@ export interface User {
   name: string;
   avatar?: string;
   role: 'owner' | 'editor' | 'viewer' | 'admin' | 'superAdmin';
+  createdAt?: Date;
+  updatedAt?: Date;
+  isActive?: boolean;
+  lastLoginAt?: Date;
 }
 
 export interface Environment {

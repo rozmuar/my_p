@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 
 interface InputModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
   title: string;
-  fields: Array<{
+  placeholder?: string;
+  defaultValue?: string;
+  fields?: Array<{
     name: string;
     label: string;
     type?: string;
@@ -16,28 +18,34 @@ interface InputModalProps {
 }
 
 const InputModal: React.FC<InputModalProps> = ({
-  isOpen,
+  isOpen = true,
   onClose,
   onSubmit,
   title,
+  placeholder,
+  defaultValue,
   fields
 }) => {
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, any>>(() => {
+    if (fields) {
+      return fields.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {});
+    } else {
+      return { value: defaultValue || '' };
+    }
+  });
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({});
+    if (fields) {
+      onSubmit(formData);
+      setFormData(fields.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}));
+    } else {
+      onSubmit(formData.value);
+      setFormData({ value: '' });
+    }
     onClose();
-  };
-
-  const handleInputChange = (name: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
   };
 
   return (
@@ -54,22 +62,36 @@ const InputModal: React.FC<InputModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit}>
-          {fields.map((field) => (
-            <div key={field.name} className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {field.label}
-                {field.required && <span className="text-red-500">*</span>}
-              </label>
+          {fields ? (
+            fields.map((field) => (
+              <div key={field.name} className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {field.label}
+                  {field.required && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type={field.type || 'text'}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  value={formData[field.name] || ''}
+                  onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            ))
+          ) : (
+            <div className="mb-4">
               <input
-                type={field.type || 'text'}
-                placeholder={field.placeholder}
-                required={field.required}
-                value={formData[field.name] || ''}
-                onChange={(e) => handleInputChange(field.name, e.target.value)}
+                type="text"
+                placeholder={placeholder}
+                value={formData.value || ''}
+                onChange={(e) => setFormData({ value: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+                autoFocus
               />
             </div>
-          ))}
+          )}
 
           <div className="flex justify-end space-x-2">
             <button
