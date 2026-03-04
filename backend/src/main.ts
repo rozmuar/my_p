@@ -99,7 +99,7 @@ async function bootstrap() {
         // User is authorized, proceed to Swagger
         next();
         
-      } catch (error) {
+      } catch (error: any) {
         if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
           return res.status(401).json({
             statusCode: 401,

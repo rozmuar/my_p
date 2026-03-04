@@ -1,5 +1,6 @@
-import { IsEmail, IsString, MinLength, IsOptional, IsBoolean } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, IsBoolean, IsEnum } from 'class-validator';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { Role } from '../user.entity';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'john@example.com' })
@@ -26,6 +27,11 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiProperty({ enum: Role, required: false })
+  @IsOptional()
+  @IsEnum(Role)
+  role?: Role;
 }
 
 export class UserResponseDto {
