@@ -21,7 +21,7 @@ const LoginPage = () => {
 
     try {
       const response = await apiService.login(formData.email, formData.password);
-      localStorage.setItem('auth_token', response.token);
+      localStorage.setItem('auth_token', response.access_token);
       
       // Загружаем данные пользователя в store
       await loadCurrentUser();
@@ -30,6 +30,7 @@ const LoginPage = () => {
       navigate('/app');
     } catch (error) {
       toast.error('Неверные данные для входа');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }

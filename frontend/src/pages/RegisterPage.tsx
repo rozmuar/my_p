@@ -33,11 +33,12 @@ const RegisterPage = () => {
 
     try {
       const response = await apiService.register(formData.name, formData.email, formData.password);
-      localStorage.setItem('auth_token', response.token);
+      localStorage.setItem('auth_token', response.access_token);
       toast.success('Аккаунт успешно создан!');
       navigate('/app');
     } catch (error) {
       toast.error('Ошибка создания аккаунта');
+      console.error('Register error:', error);
     } finally {
       setIsLoading(false);
     }
