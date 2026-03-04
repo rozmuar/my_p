@@ -35,18 +35,24 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    // Check if user already exists
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
+    try {
+      console.log('Registration attempt:', { email: registerDto.email, name: registerDto.name });
+      
+      // Check if user already exists
+      const existingUser = await this.usersService.findByEmail(registerDto.email);
+      if (existingUser) {
+        console.log('User already exists:', registerDto.email);
+        throw new ConflictException('User with this email already exists');
+      }
 
-    // Create new user
-    const user = await this.usersService.create(registerDto);
+      // Create new user
+      console.log('Creating new user...');
+      const user = await this.usersService.create(registerDto);
+      console.log('User created successfully:', user.id);
 
-    // Generate JWT token
-    const payload = { email: user.email, sub: user.id };
-    const access_token = this.jwtService.sign(payload);
+      // Generate JWT token
+      const payload = { email: user.email, sub: user.id };
+      const access_token = this.jwtService.sign(payload);
 
     return {
       access_token,

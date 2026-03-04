@@ -13,14 +13,26 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 12);
-    
-    const user = this.usersRepository.create({
-      ...createUserDto,
-      hashedPassword,
-    });
+    try {
+      console.log('Creating user with data:', { email: createUserDto.email, name: createUserDto.name });
+      
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 12);
+      console.log('Password hashed successfully');
+      
+      const user = this.usersRepository.create({
+        ...createUserDto,
+        hashedPassword,
+      });
+      console.log('User entity created, saving to database...');
 
-    return this.usersRepository.save(user);
+      const savedUser = await this.usersRepository.save(user);
+      console.log('User saved successfully:', savedUser.id);
+      
+      return savedUser;
+    } catch (error) {
+      console.error('Error creating user:', error);
+      throw error;
+    }
   }
 
   async findAll(): Promise<User[]> {

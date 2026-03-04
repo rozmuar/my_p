@@ -24,6 +24,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
       database: process.env.DB_NAME || 'postapi',
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
+      logging: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,
     UsersModule,
