@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useAppStore } from '@/store';
 import { apiService } from '@/services/api';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { loadCurrentUser } = useAppStore();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
