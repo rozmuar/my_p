@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { CodeGenerationModule } from './code-generation/code-generation.module';
 import { CollaborationModule } from './collaboration/collaboration.module';
+import { SetupModule } from './setup/setup.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CollaborationModule } from './collaboration/collaboration.module';
     RequestsModule,
     CodeGenerationModule,
     CollaborationModule,
+    SetupModule,
   ],
   controllers: [AppController],
   providers: [AppService],
