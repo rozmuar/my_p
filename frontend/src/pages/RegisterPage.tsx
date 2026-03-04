@@ -35,7 +35,7 @@ const RegisterPage = () => {
       const response = await apiService.register(formData.name, formData.email, formData.password);
       localStorage.setItem('auth_token', response.token);
       toast.success('Account created successfully!');
-      navigate('/');
+      navigate('/app');
     } catch (error) {
       toast.error('Failed to create account');
     } finally {

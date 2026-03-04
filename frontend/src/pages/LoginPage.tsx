@@ -21,7 +21,7 @@ const LoginPage = () => {
       const response = await apiService.login(formData.email, formData.password);
       localStorage.setItem('auth_token', response.token);
       toast.success('Welcome back!');
-      navigate('/');
+      navigate('/app');
     } catch (error) {
       toast.error('Invalid credentials');
     } finally {
