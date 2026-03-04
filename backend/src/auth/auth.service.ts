@@ -54,22 +54,30 @@ export class AuthService {
       const payload = { email: user.email, sub: user.id };
       const access_token = this.jwtService.sign(payload);
 
-    return {
-      access_token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        avatar: user.avatar,
-      },
-    };
+      return {
+        access_token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          avatar: user.avatar,
+        },
+      };
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
   }
 
-  async validateUser(payload: any) {
+  async validateUserByJwt(payload: any): Promise<any> {
     const user = await this.usersService.findOne(payload.sub);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid token');
     }
-    return user;
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    };
   }
 }

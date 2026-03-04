@@ -37,7 +37,7 @@ export class AppController {
       databaseStatus = 'connected';
     } catch (error) {
       console.error('Database connection error:', error);
-      databaseError = error.message;
+      databaseError = (error as Error).message;
     }
 
     return {
@@ -62,7 +62,7 @@ export class AppController {
         await this.dataSource.query('SELECT COUNT(*) FROM users');
         usersTableExists = true;
       } catch (error) {
-        console.log('Users table does not exist:', error.message);
+        console.log('Users table does not exist:', (error as Error).message);
       }
 
       return {
@@ -74,7 +74,7 @@ export class AppController {
     } catch (error) {
       return {
         message: 'Database test failed',
-        error: error.message,
+        error: (error as Error).message,
         timestamp: new Date().toISOString()
       };
     }
