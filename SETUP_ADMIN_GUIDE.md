@@ -10,51 +10,59 @@
 curl http://62.113.110.83:3001/api/setup/status
 ```
 
-**Ответ покажет:**
-```json
-{
-  "totalUsers": 0,
-  "hasSuperAdmin": false, 
-  "superAdmins": [],
-  "firstUserLogic": {
-    "note": "First registered user automatically becomes SuperAdmin",
-    "instruction": "Go to /register to create the first user"
-  }
-}
+## ✅ **Решения проблем:**
+
+### **Если есть пользователи, но нет SuperAdmin:**
+
+1. **Проверь статус:**
+```bash
+curl http://62.113.110.83:3001/api/setup/status
 ```
 
-## ✅ **Решение проблемы авторизации:**
+2. **Если `needsFix: true`, назначь первого пользователя SuperAdmin:**
+```bash
+curl -X POST http://62.113.110.83:3001/api/setup/promote-first-user \
+  -H "Content-Type: application/json" \
+  -d '{"confirmEmail": "ваш@email.com"}'
+```
 
 ### **Если `totalUsers: 0`:**
 1. 🚀 **Зарегистрируй первого пользователя**
 2. 📱 Иди на `http://62.113.110.83:8080/register`
 3. ✅ **Первый пользователь автоматически станет SuperAdmin!**
 
-### **Если есть пользователи, но `hasSuperAdmin: false`:**
-1. 💾 **В базе есть пользователи, но нет админа**
-2. 🛠️ **Нужна ручная настройка через базу данных**
-3. 📧 **Обратись к разработчику**
+## 🔒 **Безопасность назначения админа:**
+- ✅ Работает **только с первым пользователем** в системе
+- ✅ Требует **подтверждение email** первого пользователя  
+- ✅ **Одноразовое** назначение (если уже админ - откажет)
+- ✅ Нельзя назначить произвольного пользователя
 
-## 🔍 **Проверка API:**
-
-```bash
-# 1. Статус базы данных
-curl http://62.113.110.83:3001/api/setup/status
-
-# 2. Проверка API health
-curl http://62.113.110.83:3001/
-
-# 3. Тест регистрации  
-curl -X POST http://62.113.110.83:3001/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test Admin",
-    "email": "admin@test.com", 
-    "password": "password123"
-  }'
+## 🔍 **Пример ответа статуса:**
+```json
+{
+  "totalUsers": 1,
+  "hasSuperAdmin": false,
+  "firstUser": {
+    "id": "uuid",
+    "email": "user@example.com", 
+    "role": "user"
+  },
+  "firstUserLogic": {
+    "needsFix": true
+  }
+}
 ```
 
-## 🛡️ **Безопасность:**
-- ✅ Нет endpoints для создания пользователей без авторизации
-- ✅ Только диагностическая информация
-- ✅ Первый пользователь через стандартную регистрацию
+## 🚀 **Быстрое исправление для уже зарегистрированных:**
+
+```bash
+# 1. Узнай свой email из статуса
+curl http://62.113.110.83:3001/api/setup/status
+
+# 2. Назначь себя админом (используй email из ответа выше)
+curl -X POST http://62.113.110.83:3001/api/setup/promote-first-user \
+  -H "Content-Type: application/json" \
+  -d '{"confirmEmail": "твой@email.com"}'
+
+# 3. Теперь можешь логиниться как SuperAdmin!
+```
