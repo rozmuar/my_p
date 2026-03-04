@@ -49,8 +49,9 @@ RUN apk add --no-cache curl
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:80 || exit 1
 
-# Create nginx user for security
-RUN addgroup -g 101 -S nginx && adduser -S nginx -G nginx
+# Create nginx user for security (if not exists)
+RUN getent group nginx || addgroup -g 101 -S nginx
+RUN getent passwd nginx || adduser -S nginx -G nginx
 
 EXPOSE 80
 
