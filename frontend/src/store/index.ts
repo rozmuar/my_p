@@ -319,7 +319,7 @@ export const useAppStore = create<AppState>()(
           if (currentUser) return; // Already loaded
           
           const token = localStorage.getItem('auth_token');
-          if (!token) return;
+          if (!token) throw new Error('No auth token');
           
           set({ isUserLoading: true });
           try {
@@ -327,7 +327,10 @@ export const useAppStore = create<AppState>()(
             set({ currentUser: user, isUserLoading: false });
           } catch (error) {
             console.error('Failed to load current user:', error);
-            set({ isUserLoading: false });
+            set({ isUserLoading: false, currentUser: null });
+            // Удаляем недействительный токен
+            localStorage.removeItem('auth_token');
+            throw error;
           }
         },
 

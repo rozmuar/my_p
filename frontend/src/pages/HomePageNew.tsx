@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import { t } from '@/i18n/russian';
 import { Plus, Play, History, Code, Split, Columns, PanelLeftOpen, PanelRightOpen, Settings } from 'lucide-react';
@@ -10,6 +11,7 @@ import HistoryPanelNew from '@/components/HistoryPanelNew';
 import CodeGeneratorNew from '@/components/CodeGeneratorNew';
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const { 
     collections, 
     selectedCollectionId, 
@@ -18,8 +20,29 @@ const HomePage = () => {
     createRequest,
     sidebarCollapsed,
     setSidebarCollapsed,
-    addCollection
+    addCollection,
+    currentUser,
+    isUserLoading,
+    loadCurrentUser
   } = useAppStore();
+
+  // Проверка аутентификации
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    
+    if (!currentUser && !isUserLoading) {
+      loadCurrentUser().catch(() => {
+        // Если токен недействительный, редиректим на логин
+        localStorage.removeItem('auth_token');
+        navigate('/login');
+      });
+    }
+  }, [currentUser, isUserLoading, loadCurrentUser, navigate]);
 
   const [activeTab, setActiveTab] = useState<'response' | 'code' | 'history'>('response');
   const [layout, setLayout] = useState<'horizontal' | 'vertical'>('horizontal'); 
@@ -49,6 +72,23 @@ const HomePage = () => {
   };
 
   const currentRequest = getCurrentRequest();
+
+  // Показываем загрузку пока проверяется аутентификация
+  if (isUserLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Не отображаем страницу если пользователь не загружен 
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">

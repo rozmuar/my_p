@@ -20,6 +20,10 @@ const LoginPage = () => {
     try {
       const response = await apiService.login(formData.email, formData.password);
       localStorage.setItem('auth_token', response.token);
+      
+      // Загружаем данные пользователя в store
+      await loadCurrentUser();
+      
       toast.success('Добро пожаловать!');
       navigate('/app');
     } catch (error) {
